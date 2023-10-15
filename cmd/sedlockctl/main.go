@@ -35,7 +35,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("drive.Open: %v", err)
 	}
-	defer coreObj.Close()
+	defer func(coreObj *core.Core) {
+		_ = coreObj.Close()
+	}(coreObj)
 
 	snRaw, err := coreObj.DriveIntf.SerialNumber()
 	if err != nil {
@@ -65,7 +67,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("locking.Initalize: %v", err)
 	}
-	defer cs.Close()
+	defer func(cs *core.ControlSession) {
+		_ = cs.Close()
+	}(cs)
 
 	var auth locking.LockingSPAuthenticator
 	pin := []byte{}
@@ -97,7 +101,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("locking.NewSession: %v", err)
 	}
-	defer l.Close()
+	defer func(l *locking.LockingSP) {
+		_ = l.Close()
+	}(l)
 
 	// Run the command
 	err = ctx.Run(&context{session: l})

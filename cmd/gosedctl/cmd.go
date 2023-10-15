@@ -99,7 +99,7 @@ func (t *PasswordEmbed) GenerateHash(coreObj *core.Core) ([]byte, error) {
 }
 
 // Run executes when the initial-setup command is invoked
-func (t *initialSetupCmd) Run(ctx *context) error {
+func (t *initialSetupCmd) Run(_ *context) error {
 	fmt.Printf("Open device: %s", t.Device)
 	coreObj, err := core.NewCore(t.Device)
 	if err != nil {
@@ -157,7 +157,9 @@ func (t *initialSetupCmd) Run(ctx *context) error {
 	if err := table.LockingSPActivate(adminSession); err != nil {
 		return fmt.Errorf("LockingSPActivate() failed: %v", err)
 	}
-	adminSession.Close()
+	if err := adminSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	fmt.Println("Configure LockingRange0")
 	// Configure LockingRange0
@@ -166,7 +168,9 @@ func (t *initialSetupCmd) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewSession() to LockingSP failed: %v", err)
 	}
-	defer lockingSession.Close()
+	if err := lockingSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 	// Elevate the session to Admin1 with required credentials
 	if err := table.ThisSP_Authenticate(lockingSession, uid.LockingAuthorityAdmin1, pwhash); err != nil {
 		return fmt.Errorf("authenticating as Admin1 failed: %v", err)
@@ -194,7 +198,7 @@ func (t *initialSetupCmd) Run(ctx *context) error {
 	return nil
 }
 
-func (l *loadPBAImageCmd) Run(ctx *context) error {
+func (l *loadPBAImageCmd) Run(_ *context) error {
 	img, err := os.ReadFile(l.PBAImage)
 	if err != nil {
 		return fmt.Errorf("ReadFile(l.PBAImage) failed: %v", err)
@@ -227,7 +231,9 @@ func (l *loadPBAImageCmd) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewSession() to LockingSP failed: %v", err)
 	}
-	defer lockingSession.Close()
+	if err := lockingSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 	// Elevate the session to Admin1 with required credentials
 	if err := table.ThisSP_Authenticate(lockingSession, uid.LockingAuthorityAdmin1, pwhash); err != nil {
 		return fmt.Errorf("authenticating as Admin1 failed: %v", err)
@@ -239,7 +245,7 @@ func (l *loadPBAImageCmd) Run(ctx *context) error {
 	return nil
 }
 
-func (r *revertNoeraseCmd) Run(ctx *context) error {
+func (r *revertNoeraseCmd) Run(_ *context) error {
 	if r.Password == "" {
 		return fmt.Errorf("empty password not allowed")
 	}
@@ -267,7 +273,9 @@ func (r *revertNoeraseCmd) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewSession() to LockingSP failed: %v", err)
 	}
-	defer lockingSession.Close()
+	if err := lockingSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 	// Elevate the session to Admin1 with required credentials
 	if err := table.ThisSP_Authenticate(lockingSession, uid.LockingAuthorityAdmin1, pwhash); err != nil {
 		return fmt.Errorf("authenticating as Admin1 failed: %v", err)
@@ -279,7 +287,7 @@ func (r *revertNoeraseCmd) Run(ctx *context) error {
 	return nil
 }
 
-func (r *revertTPerCmd) Run(ctx *context) error {
+func (r *revertTPerCmd) Run(_ *context) error {
 	coreObj, err := core.NewCore(r.Device)
 	if err != nil {
 		return fmt.Errorf("NewCore(%s) failed: %v", r.Device, err)
@@ -312,7 +320,7 @@ func (r *revertTPerCmd) Run(ctx *context) error {
 	return nil
 }
 
-func (i *initialSetupEnterpriseCmd) Run(ctx *context) error {
+func (i *initialSetupEnterpriseCmd) Run(_ *context) error {
 	coreObj, err := core.NewCore(i.Device)
 	if err != nil {
 		return fmt.Errorf("NewCore(%s) failed: %v", i.Device, err)
@@ -327,7 +335,9 @@ func (i *initialSetupEnterpriseCmd) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewControllSession() failed: %v", err)
 	}
-	defer cs.Close()
+	if err := cs.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	adminSession, err := cs.NewSession(uid.AdminSP)
 	if err != nil {
@@ -363,7 +373,9 @@ func (i *initialSetupEnterpriseCmd) Run(ctx *context) error {
 		return fmt.Errorf("NewSession() to LockingSP failed: %v", err)
 	}
 
-	defer lockingSession.Close()
+	if err := lockingSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	band0pw, err := i.BandMaster0PW.GenerateHash(coreObj)
 	if err != nil {
@@ -406,7 +418,7 @@ func (i *initialSetupEnterpriseCmd) Run(ctx *context) error {
 	return nil
 }
 
-func (r *resetDeviceEnterprise) Run(ctx *context) error {
+func (r *resetDeviceEnterprise) Run(_ *context) error {
 	coreObj, err := core.NewCore(r.Device)
 	if err != nil {
 		return fmt.Errorf("NewCore(%s) failed: %v", r.Device, err)
@@ -421,7 +433,9 @@ func (r *resetDeviceEnterprise) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewControllSession() failed: %v", err)
 	}
-	defer cs.Close()
+	if err := cs.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	eraseHash, err := r.EaseMasterPassword.GenerateHash(coreObj)
 	if err != nil {
@@ -488,7 +502,7 @@ func (r *resetDeviceEnterprise) Run(ctx *context) error {
 	return nil
 }
 
-func (u *unlockEnterprise) Run(ctx *context) error {
+func (u *unlockEnterprise) Run(_ *context) error {
 	coreObj, err := core.NewCore(u.Device)
 	if err != nil {
 		return fmt.Errorf("NewCore(%s) failed: %v", u.Device, err)
@@ -503,7 +517,9 @@ func (u *unlockEnterprise) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewControllSession() failed: %v", err)
 	}
-	defer cs.Close()
+	if err := cs.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	pwhash, err := u.BandMaster0PW.GenerateHash(coreObj)
 	if err != nil {
@@ -515,7 +531,9 @@ func (u *unlockEnterprise) Run(ctx *context) error {
 		return fmt.Errorf("NewSession() to LockingSP failed: %v", err)
 	}
 
-	defer lockingSession.Close()
+	if err := lockingSession.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	if err := table.ThisSP_Authenticate(lockingSession, uid.LockingAuthorityBandMaster0, pwhash); err != nil {
 		return fmt.Errorf("authenticating as BandMaster0 failed: %v", err)
@@ -527,7 +545,7 @@ func (u *unlockEnterprise) Run(ctx *context) error {
 	return nil
 }
 
-func (r *resetSIDcmd) Run(ctx *context) error {
+func (r *resetSIDcmd) Run(_ *context) error {
 	coreObj, err := core.NewCore(r.Device)
 	if err != nil {
 		return fmt.Errorf("NewCore(%s) failed: %v", r.Device, err)
@@ -542,7 +560,9 @@ func (r *resetSIDcmd) Run(ctx *context) error {
 	if err != nil {
 		return fmt.Errorf("NewControllSession() failed: %v", err)
 	}
-	defer cs.Close()
+	if err := cs.Close(); err != nil {
+		return fmt.Errorf("failed to close session: %v", err)
+	}
 
 	adminSession, err := cs.NewSession(uid.AdminSP)
 	if err != nil {
