@@ -9,6 +9,7 @@ require (
 	github.com/prometheus/client_golang v1.17.0
 	github.com/prometheus/common v0.44.0
 	golang.org/x/crypto v0.14.0
+	golang.org/x/term v0.13.0
 )
 
 require (

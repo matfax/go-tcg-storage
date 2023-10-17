@@ -5,6 +5,7 @@
 package main
 
 import (
+	plugins "github.com/matfax/go-tcg-storage/pkg/cli"
 	"github.com/matfax/go-tcg-storage/pkg/core/hash"
 	"log"
 
@@ -25,6 +26,7 @@ func main() {
 		kong.Name(programName),
 		kong.Description(programDesc),
 		kong.UsageOnError(),
+		kong.Resolvers(plugins.ResolvePassword()),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,
 			Summary: true,
