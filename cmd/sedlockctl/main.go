@@ -5,9 +5,10 @@
 package main
 
 import (
+	"log"
+
 	plugins "github.com/matfax/go-tcg-storage/pkg/cli"
 	"github.com/matfax/go-tcg-storage/pkg/core/hash"
-	"log"
 
 	"github.com/alecthomas/kong"
 	"github.com/matfax/go-tcg-storage/pkg/core"
@@ -52,6 +53,8 @@ func main() {
 		switch cli.Sidhash {
 		case "sedutil-dta":
 			spin = hash.HashSedutilDTA(cli.Sidpin, sn)
+		case "sedutil-sha512":
+			spin = hash.HashSedutil512(cli.Sidpin, sn)
 		default:
 			log.Fatalf("Unknown hash method %q", cli.Sidhash)
 		}
