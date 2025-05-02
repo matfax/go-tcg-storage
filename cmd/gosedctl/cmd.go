@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/alecthomas/kong"
 	core "github.com/matfax/go-tcg-storage/pkg/core"
 	hash "github.com/matfax/go-tcg-storage/pkg/core/hash"
@@ -83,7 +84,7 @@ func (t *PasswordEmbed) GenerateHash(coreObj *core.Core) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("coreObj.SerialNumber() failed: %v", err)
 	}
-	salt := fmt.Sprintf("%-20s", serial)
+	salt := string(serial)
 
 	switch t.Hash {
 	// Drive-Trust-Alliance uses sha1
